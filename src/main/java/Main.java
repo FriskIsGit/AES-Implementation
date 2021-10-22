@@ -1,6 +1,4 @@
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -17,25 +15,69 @@ import java.util.*;
  *      - addRoundKey
  */
 class Main{
+    final String[][] HEX_S_BOX;
+    final byte[][] BYTE_S_BOX;
 
+    Main(){
+        HEX_S_BOX = new String[][]{
+                {"63", "7c", "77", "7b", "f2", "6b", "6f", "c5", "30", "1", "67", "2b", "fe", "d7", "ab", "76" },
+                {"ca", "82", "c9", "7d", "fa", "59", "47", "f0", "ad", "d4", "a2", "af", "9c", "a4", "72", "c0" },
+                {"b7", "fd", "93", "26", "36", "3f", "f7", "cc", "34", "a5", "e5", "f1", "71", "d8", "31", "15" },
+                {"4", "c7", "23", "c3", "18", "96", "5", "9a", "7", "12", "80", "e2", "eb", "27", "b2", "75" },
+                {"9", "83", "2c", "1a", "1b", "6e", "5a", "a0", "52", "3b", "d6", "b3", "29", "e3", "2f", "84" },
+                {"53", "d1", "0", "ed", "20", "fc", "b1", "5b", "6a", "cb", "be", "39", "4a", "4c", "58", "cf" },
+                {"d0", "ef", "aa", "fb", "43", "4d", "33", "85", "45", "f9", "2", "7f", "50", "3c", "9f", "a8" },
+                {"51", "a3", "40", "8f", "92", "9d", "38", "f5", "bc", "b6", "da", "21", "10", "ff", "f3", "d2" },
+                {"cd", "0c", "13", "ec", "5f", "97", "44", "17", "c4", "a7", "7e", "3d", "64", "5d", "19", "73"},
+                {"60", "81", "4f", "dc", "22", "2a", "90", "88", "46", "ee", "b8", "14", "de", "5e", "0b", "db"},
+                {"e0", "32", "3a", "0a", "49", "6", "24", "5c", "c2", "d3", "ac", "62", "91", "95", "e4", "79"},
+                {"e7", "c8", "37", "6d", "8d", "d5", "4e", "a9", "6c", "56", "f4", "ea", "65", "7a", "ae", "08"},
+                {"ba", "78", "25", "2e", "1c", "a6", "b4", "c6", "e8", "dd", "74", "1f", "4b", "bd", "8b", "8a"},
+                {"70", "3e", "b5", "66", "48", "3", "f6", "0e", "61", "35", "57", "b9", "86", "c1", "1d", "9e"},
+                {"e1", "f8", "98", "11", "69", "d9", "8e", "94", "9b", "1e", "87", "e9", "ce", "55", "28", "df"},
+                {"8c", "a1", "89", "0d", "bf", "e6", "42", "68", "41", "99", "2d", "0f", "b0", "54", "bb", "16"}
+        };
+        BYTE_S_BOX = new byte[][]{
+                {99, 124, 119, 123, -14, 107, 111, -59, 48, 1, 103, 43, -2, -41, -85, 118},
+                {-54, -126, -55, 125, -6, 89, 71, -16, -83, -44, -94, -81, -100, -92, 114, -64},
+                {-73, -3, -109, 38, 54, 63, -9, -52, 52, -91, -27, -15, 113, -40, 49, 21},
+                {4, -57, 35, -61, 24, -106, 5, -102, 7, 18, -128, -30, -21, 39, -78, 117},
+                {9, -125, 44, 26, 27, 110, 90, -96, 82, 59, -42, -77, 41, -29, 47, -124},
+                {83, -47, 0, -19, 32, -4, -79, 91, 106, -53, -66, 57, 74, 76, 88, -49},
+                {-48, -17, -86, -5, 67, 77, 51, -123, 69, -7, 2, 127, 80, 60, -97, -88},
+                {81, -93, 64, -113, -110, -99, 56, -11, -68, -74, -38, 33, 16, -1, -13, -46},
+                {-51, 12, 19, -20, 95, -105, 68, 23, -60, -89, 126, 61, 100, 93, 25, 115},
+                {96, -127, 79, -36, 34, 42, -112, -120, 70, -18, -72, 20, -34, 94, 11, -37},
+                {-32, 50, 58, 10, 73, 6, 36, 92, -62, -45, -84, 98, -111, -107, -28, 121},
+                {-25, -56, 55, 109, -115, -43, 78, -87, 108, 86, -12, -22, 101, 122, -82, 8},
+                {-70, 120, 37, 46, 28, -90, -76, -58, -24, -35, 116, 31, 75, -67, -117, -118},
+                {112, 62, -75, 102, 72, 3, -10, 14, 97, 53, 87, -71, -122, -63, 29, -98},
+                {-31, -8, -104, 17, 105, -39, -114, -108, -101, 30, -121, -23, -50, 85, 40, -33},
+                {-116, -95, -119, 13, -65, -26, 66, 104, 65, -103, 45, 15, -80, 84, -69, 22}};
+    }
     public static int getRandom(){
         return (int)(Math.random()*(122-97+1))+97;
     }
     public static void main(String[] args)  {
-        Converter con = new Converter();
-        int [] arr = new int[]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-        String [] strArr = new String[]{"19","3d","e3","be","a0","f4","e2","2b","9a","c6","8d","2a","e9","f8","48","08"};
-        con.display4by4(arr);
-        //new Converter().display4by4(strArr);
-        System.out.println(con.hexStringToInt("fc"));
-
+        Main program = new Main();
         //getPass();
+        String [] state = {"19","a0","9a","e9","3d","f4","c6","f8","e3","e2","8d","48","be","2b","2a","08"};
+        String [] result = new String[state.length];
+        for(int i = 0; i<state.length;i++){
+            int[] indices = Convert.unsignedByteToIndices(Convert.byteToUnsignedByte((byte) Convert.hexStringToInt(state[i])));
+            result[i] = program.HEX_S_BOX[indices[0]][indices[1]];
+        }
+        System.out.println(Arrays.toString(result));
+
     }
 
 
-    private static void getPass(){
+    private static String getPass(){
         Scanner scan = new Scanner(System.in);
         String pass = scan.nextLine();
         System.out.println("Length: " + pass.length());
+        byte [] inputArr = pass.getBytes(StandardCharsets.UTF_8);
+        System.out.println(Arrays.toString(inputArr));
+        return pass;
     }
 }
