@@ -1,7 +1,6 @@
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
 public class Tester{
     // A - 10; B - 11; C - 12; D - 13; E - 14;  F - 15;
@@ -32,6 +31,14 @@ public class Tester{
     @Test
     public void single(){
         assertArrayEquals(new int[]{0,1}, Convert.unsignedByteToIndices(1));
+    }
+    @Test
+    public void upperBound(){
+        assertArrayEquals(new int[]{15,15}, Convert.unsignedByteToIndices(255));
+    }
+    @Test
+    public void lowerBound(){
+        assertArrayEquals(new int[]{0,0}, Convert.unsignedByteToIndices(0));
     }
 
 

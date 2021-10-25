@@ -11,10 +11,17 @@ class Convert{
             return -1;
         }
     }
-    protected static String [] intArrHexStringArr(int [] arr){
+    protected static String [] arrToHexStringArr(int [] arr){
         String [] hexArr = new String[arr.length];
         for(int i = 0; i<arr.length; i++){
             hexArr[i] = intToHexString(arr[i]);
+        }
+        return hexArr;
+    }
+    protected static String [] arrToHexStringArr(byte [] arr){
+        String [] hexArr = new String[arr.length];
+        for(int i = 0; i<arr.length; i++){
+            hexArr[i] = intToHexString(Byte.toUnsignedInt(arr[i]));
         }
         return hexArr;
     }
@@ -38,7 +45,8 @@ class Convert{
             }
         }
     }*/
-    protected static int byteToUnsignedByte(byte givenByte){
+
+    protected static int byteToUnsigned(byte givenByte){
         return givenByte<0 ? 256+givenByte : givenByte;
     }
     protected static int[] unsignedByteToIndices(int uByte){
