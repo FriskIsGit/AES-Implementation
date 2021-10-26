@@ -2,7 +2,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 
-public class Tester{
+public class HexParserTest{
     // A - 10; B - 11; C - 12; D - 13; E - 14;  F - 15;
     @Test
     public void test1(){

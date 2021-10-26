@@ -111,14 +111,32 @@ class Main{
         String [] hexArrText = Convert.arrToHexStringArr(plainArr);
         System.out.println(Arrays.toString(hexArrText));*/
         int [] state = new int[]{0xd4,0xe0,0xb8,0x1e,0xbf,0xb4,0x41,0x27,0x5d,0x52,0x11,0x98,0x30,0xae,0xf1,0xe5};
-        /*byte result1 = multiply((byte)0xd4,2);
-        byte result2 = multiply((byte)0xbf,3);
-        byte result3 = multiply((byte)0x5d,1);
-        byte result4 = multiply((byte)0x30,1);
-        System.out.println(result1^result2^result3^result4);*/
-
-
+        byte [] byteArr = new byte[state.length];
+        for(int i = 0; i<state.length; i++){
+            byteArr[i] = (byte)state[i];
+        }
+        System.out.println(Arrays.toString(byteArr));
+        mixColumns(byteArr);
     }
+    protected static byte[] mixColumns(byte [] arr){
+        int cell = 0;
+        for(int col = 0; col<4; col++){
+            boolean firstEntry = true;
+            byte singleCellResult = -1;
+            for(int row = col; row<16; row+=4, cell++){
+                if(firstEntry){
+                    singleCellResult = multiply(arr[row], GALOIS[cell]);
+                    firstEntry = false;
+                }
+                else{
+                    singleCellResult ^= multiply(arr[row],GALOIS[cell]);
+                }
+            }
+            arr[cell-4] = singleCellResult;
+        }
+        return arr;
+    }
+
     //performs hex multiplication (MixColumns) while ensuring bits don't overflow
     protected static byte multiply(byte myByte, int times){
         if(times>1){
