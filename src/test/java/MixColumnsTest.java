@@ -20,6 +20,10 @@ public class MixColumnsTest{
         byte result2 = Main.multiply(byteRow1Col0,2);
         byte result3 = Main.multiply(byteRow2Col0,3);
         byte result4 = Main.multiply(byteRow3Col0,1);
+        System.out.println(result1);
+        System.out.println(result2);
+        System.out.println(result3);
+        System.out.println(result4);
         assertEquals((byte)0x66,result1^result2^result3^result4);
     }
     @Test

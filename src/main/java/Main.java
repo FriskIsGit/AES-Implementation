@@ -23,7 +23,7 @@ class Main{
             {"63", "7c", "77", "7b", "f2", "6b", "6f", "c5", "30", "1", "67", "2b", "fe", "d7", "ab", "76" },
             {"ca", "82", "c9", "7d", "fa", "59", "47", "f0", "ad", "d4", "a2", "af", "9c", "a4", "72", "c0" },
             {"b7", "fd", "93", "26", "36", "3f", "f7", "cc", "34", "a5", "e5", "f1", "71", "d8", "31", "15" },
-            {"4", "c7", "23", "c3", "18", "96", "5", "9a", "7", "12", "80", "e2", "eb", "27", "b2", "75" },
+            {"4",  "c7", "23", "c3", "18", "96",  "5", "9a",  "7", "12", "80", "e2", "eb", "27", "b2", "75" },
             {"9", "83", "2c", "1a", "1b", "6e", "5a", "a0", "52", "3b", "d6", "b3", "29", "e3", "2f", "84" },
             {"53", "d1", "0", "ed", "20", "fc", "b1", "5b", "6a", "cb", "be", "39", "4a", "4c", "58", "cf" },
             {"d0", "ef", "aa", "fb", "43", "4d", "33", "85", "45", "f9", "2", "7f", "50", "3c", "9f", "a8" },
@@ -95,46 +95,59 @@ class Main{
     public static int getRandom(){
         return (int)(Math.random()*(122-97+1))+97;
     }
-    
+
     public static void main(String[] args)  {
-        encryptData(null,null);
-        /*
+
+        String keyStr = "Two One Nine Two";
+        int [] initialState = new int[]{0x32,0x88,0x31,0xe0,0x43,0x5a,0x31,0x37,0xf6,0x30,0x98,0x07,0xa8,0x8d,0xa2,0x34};
+        byte [] initState = Convert.arrToByteArr(initialState);
         String [] cipherKeyArr = new String[]{"2b","28","ab","09","7e","ae","f7","cf","15","d2","15","4f","16","a6","88","3c"};
+        byte [] key = new byte[cipherKeyArr.length];
         for(int i = 0;i <cipherKeyArr.length; i++){
-            System.out.print((char)Convert.hexStringToInt(cipherKeyArr[i]));
+            key[i] = (byte)Convert.hexStringToInt(cipherKeyArr[i]);
         }
-        */
-        //String key = "Thats my Kung Fu";//=getPass();
-        //byte [] bytes = key.getBytes(StandardCharsets.UTF_8);
-        /*String plainText = "Two One Nine Two";
-        byte[] plainArr = plainText.getBytes(StandardCharsets.UTF_8);
-        String [] hexArrText = Convert.arrToHexStringArr(plainArr);
-        System.out.println(Arrays.toString(hexArrText));*/
-        int [] state = new int[]{0xd4,0xe0,0xb8,0x1e,0xbf,0xb4,0x41,0x27,0x5d,0x52,0x11,0x98,0x30,0xae,0xf1,0xe5};
-        byte [] byteArr = new byte[state.length];
-        for(int i = 0; i<state.length; i++){
-            byteArr[i] = (byte)state[i];
-        }
-        System.out.println(Arrays.toString(byteArr));
-        mixColumns(byteArr);
+        System.out.println(Arrays.toString(initState));
+        System.out.println(Arrays.toString(key));
+
+        encryptData((byte[]) null,null);
+
     }
-    protected static byte[] mixColumns(byte [] arr){
-        int cell = 0;
-        for(int col = 0; col<4; col++){
-            boolean firstEntry = true;
-            byte singleCellResult = -1;
-            for(int row = col; row<16; row+=4, cell++){
-                if(firstEntry){
-                    singleCellResult = multiply(arr[row], GALOIS[cell]);
-                    firstEntry = false;
-                }
-                else{
-                    singleCellResult ^= multiply(arr[row],GALOIS[cell]);
-                }
-            }
-            arr[cell-4] = singleCellResult;
+    protected static void subBytes(byte[] state){
+        for(int i = 0;i<state.length; i++){
+            int [] indexes = Convert.unsignedByteToIndices(Convert.byteToUnsigned(state[i]));
+            state[i] = (byte)INT_S_BOX[indexes[0]][indexes[1]];
         }
-        return arr;
+    }
+
+    //XOR values at respective indices, pass by reference
+    protected static void addRoundKey(byte [] state, byte [] roundKey){
+        for(int i = 0;i<state.length; i++){
+            state[i] = (byte) (state[i]^roundKey[i]);
+        }
+    }
+
+    //traverses galois - horizontally, arr - vertically
+    protected static byte[] mixColumns(byte [] arr){
+        byte [] computedArr = new byte[arr.length];
+        for(int col = 0; col<4; col++){
+            //galois field is traversed in total 4 times
+            int galoisCell = 0;
+            for(int row = 0; row<4; row++){
+                boolean firstEntry = true;
+                byte singleCellResult = -1;
+                for(int i = col; i<16; i+=4, galoisCell++){
+                    if(firstEntry){
+                        singleCellResult = multiply(arr[i], GALOIS[galoisCell]);
+                        firstEntry = false;
+                    }
+                    else{
+                        singleCellResult ^= multiply(arr[i],GALOIS[galoisCell]);
+                    }
+                }
+                computedArr[row*4 + col] = singleCellResult;
+            }
+        }
+        return computedArr;
     }
 
     //performs hex multiplication (MixColumns) while ensuring bits don't overflow
@@ -153,10 +166,20 @@ class Main{
                 myByte^=original;
             }
         }
-        System.out.println("Returned: " + myByte + "; unsignedInt: " + Byte.toUnsignedInt(myByte));
+        //System.out.println("Returned: " + myByte + "; unsignedInt: " + Byte.toUnsignedInt(myByte));
         return myByte;
     }
     private static byte bt(int x){ return (byte)x; }
+    //128bit?
+    protected static void rotateVertically(byte [] state,int column){
+
+    }
+
+    protected static void shiftRows(byte [] arr){
+        for(int shifts = 1; shifts<4;shifts++){
+            shiftLeft(arr,shifts,shifts);
+        }
+    }
     private static void shiftLeft(byte[] arr, int shifts, int row){
         row*=4;
         byte temp;
@@ -186,21 +209,31 @@ class Main{
                 break;
         }
     }
-    /*private static void shiftLeft(int[] arr, int row, int shifts){
-        for(int i = row; i<arr.length-4; i++){
-            int temp =
+
+    private static void encryptData(byte [] state, byte [] roundKey){
+        addRoundKey(state,roundKey);
+        for(int round = 1; round<10; round++){
+            subBytes(state);
+            //shiftRows
+            shiftRows(state);
+            mixColumns(state);
+            addRoundKey(state,roundKey);
         }
-    }*/
-
-
-    private static void encryptData(String plainText, String key){
+        subBytes(state);
+        shiftRows(state);
+        addRoundKey(state,roundKey);
+        System.out.println(Arrays.toString(Convert.arrToHexStringArr(state)));
     }
 
+    private static void encryptData(String plainText, String key){
+        for(int round = 1; round<10; round++){
+
+        }
+    }
 
     private static String getPass(){
         Scanner scan = new Scanner(System.in);
         String pass = scan.nextLine();
-        System.out.println("Length: " + pass.length());
         byte [] inputArr = pass.getBytes(StandardCharsets.UTF_8);
         System.out.println(Arrays.toString(inputArr));
         return pass;
