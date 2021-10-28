@@ -90,8 +90,10 @@ class Main{
             0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd,
             0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d};
     final static int[] GALOIS = new int[]{2,3,1,1, 1,2,3,1, 1,1,2,3, 3,1,1,2};
-
-    Main(){}
+    protected List<byte []> ciphersList;
+    Main(){
+        ciphersList = new LinkedList<>();
+    }
     public static int getRandom(){
         return (int)(Math.random()*(122-97+1))+97;
     }
@@ -112,6 +114,12 @@ class Main{
         encryptData((byte[]) null,null);
 
     }
+    //block cipher      1) append a byte with value 128 (hex 80), followed by as many zero bytes as needed to fill the last block
+    //padding concepts  2) pad the last block with n bytes all with value n.
+    protected static void padding(byte [] arr){
+
+    }
+
     protected static void subBytes(byte[] state){
         for(int i = 0;i<state.length; i++){
             int [] indexes = Convert.unsignedByteToIndices(Convert.byteToUnsigned(state[i]));
@@ -153,7 +161,7 @@ class Main{
     //performs hex multiplication (MixColumns) while ensuring bits don't overflow
     protected static byte multiply(byte myByte, int times){
         if(times>1){
-            //value derived from field representation
+            //0x1b corresponds to the irreducible polynomial with the high term eliminated
             byte special=(byte)0x1b;
             byte original = myByte;
             myByte<<=1;
@@ -171,7 +179,14 @@ class Main{
     }
     private static byte bt(int x){ return (byte)x; }
     //128bit?
-    protected static void rotateVertically(byte [] state,int column){
+    protected static void rotateVertically(byte [] state, int column){
+        //4 rows, 32 columns, in total: 128 elements, single dimensional arr
+        if(state.length<128 || column>31) return;
+        byte temp = state[column];
+        state[column]=state[column+32];
+        state[column+32]=state[column+64];
+        state[column+64]=state[column+96];
+        state[column+96]=temp;
 
     }
 

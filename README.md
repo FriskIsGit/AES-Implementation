@@ -11,3 +11,6 @@
 ####sources:
 - https://formaestudio.com/rijndaelinspector/archivos/Rijndael_Animation_v4_eng-html5.html
 - https://crypto.stackexchange.com/questions/2402/how-to-solve-mixcolumns
+
+![image](mixColumns.png)
+![image](standards.png)
