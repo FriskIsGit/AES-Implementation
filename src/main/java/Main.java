@@ -1,8 +1,4 @@
-import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -72,7 +68,7 @@ class Main{
             {112, 62, -75, 102, 72, 3, -10, 14, 97, 53, 87, -71, -122, -63, 29, -98},
             {-31, -8, -104, 17, 105, -39, -114, -108, -101, 30, -121, -23, -50, 85, 40, -33},
             {-116, -95, -119, 13, -65, -26, 66, 104, 65, -103, 45, 15, -80, 84, -69, 22}};
-    final static int[] RCON = new int[]{
+    final static int[] RCON_256 = new int[]{
             0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
             0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39,
             0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a,
@@ -89,7 +85,14 @@ class Main{
             0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63,
             0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd,
             0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d};
+    final static int[] RCON_10 = new int[]{
+            0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     final static int[] GALOIS = new int[]{2,3,1,1, 1,2,3,1, 1,1,2,3, 3,1,1,2};
+    final static int BIT_128 = 128;
+    final static int ROUNDS = 10;
     protected List<byte []> ciphersList;
     Main(){
         ciphersList = new LinkedList<>();
@@ -104,19 +107,62 @@ class Main{
         int [] initialState = new int[]{0x32,0x88,0x31,0xe0,0x43,0x5a,0x31,0x37,0xf6,0x30,0x98,0x07,0xa8,0x8d,0xa2,0x34};
         byte [] initState = Convert.arrToByteArr(initialState);
         String [] cipherKeyArr = new String[]{"2b","28","ab","09","7e","ae","f7","cf","15","d2","15","4f","16","a6","88","3c"};
-        byte [] key = new byte[cipherKeyArr.length];
-        for(int i = 0;i <cipherKeyArr.length; i++){
-            key[i] = (byte)Convert.hexStringToInt(cipherKeyArr[i]);
-        }
+        byte [] key = new byte[]{43, 40, -85, 9, 126, -82, -9, -49, 21, -46, 21, 79, 22, -90, -120, 60};
         System.out.println(Arrays.toString(initState));
         System.out.println(Arrays.toString(key));
+
 
         encryptData((byte[]) null,null);
 
     }
+    protected static void xorWithRcon(byte[] arr, final int rconCol, final int col1, final int col2){
+        int diff = col2-col1;
+        for(int i = col1, ri=rconCol; i+diff<BIT_128; i+=32, ri+=10){
+            arr[i+diff] = (byte) (arr[i]^arr[i+diff]^RCON_10[ri]);
+        }
+    }
+
+    protected static void xor(byte[] arr, int col1, int col2, int targetCol){
+        for(;targetCol<BIT_128; targetCol+=32,col1+=32, col2+=32){
+            arr[targetCol] = (byte) (arr[col1]^arr[col2]);
+        }
+    }
+
+    protected static void keySchedule(byte [] arr){
+        for(int block = 0; block < 7; block++){
+            final int leadingCol = 4*(block+1);
+            rotateVertically(arr,leadingCol-1,leadingCol);
+            subBytes(arr, leadingCol);
+            xorWithRcon(arr, block, leadingCol-4, leadingCol);
+            for(int i = leadingCol+1; i<leadingCol+4; i++){
+                xor(arr,i-4,i-1,i);
+            }
+
+        }
+    }
+
+    //128bit?
+    protected static void rotateVertically(byte [] state, final int accordingTo, final int column){
+        //4 rows, 32 columns, in total: 128 elements, single dimensional arr
+        if(state.length<BIT_128 || column>31) return;
+        state[column] = state[accordingTo+32];
+        state[column+32] = state[accordingTo+64];
+        state[column+64] = state[accordingTo+96];
+        state[column+96] = state[accordingTo];
+    }
+
+
     //block cipher      1) append a byte with value 128 (hex 80), followed by as many zero bytes as needed to fill the last block
     //padding concepts  2) pad the last block with n bytes all with value n.
-    protected static void padding(byte [] arr){
+    protected static byte [] padding(byte [] arr){
+        byte [] paddedArr = new byte[BIT_128];
+        for(int i = 0; i<arr.length; i++){
+            if(arr[i]==0){
+                System.arraycopy(arr,0,paddedArr,0,i);
+                Arrays.fill(paddedArr,i,paddedArr.length, (byte) 0);
+            }
+        }
+        return paddedArr;
 
     }
 
@@ -124,6 +170,12 @@ class Main{
         for(int i = 0;i<state.length; i++){
             int [] indexes = Convert.unsignedByteToIndices(Convert.byteToUnsigned(state[i]));
             state[i] = (byte)INT_S_BOX[indexes[0]][indexes[1]];
+        }
+    }
+    protected static void subBytes(byte[] arr, int column){
+        for(int i = column;i<arr.length; i+=32){
+            int [] indexes = Convert.unsignedByteToIndices(Convert.byteToUnsigned(arr[i]));
+            arr[i] = (byte)INT_S_BOX[indexes[0]][indexes[1]];
         }
     }
 
@@ -159,7 +211,7 @@ class Main{
     }
 
     //performs hex multiplication (MixColumns) while ensuring bits don't overflow
-    protected static byte multiply(byte myByte, int times){
+    protected static byte multiply(byte myByte, final int times){
         if(times>1){
             //0x1b corresponds to the irreducible polynomial with the high term eliminated
             byte special=(byte)0x1b;
@@ -174,21 +226,10 @@ class Main{
                 myByte^=original;
             }
         }
-        //System.out.println("Returned: " + myByte + "; unsignedInt: " + Byte.toUnsignedInt(myByte));
         return myByte;
     }
     private static byte bt(int x){ return (byte)x; }
-    //128bit?
-    protected static void rotateVertically(byte [] state, int column){
-        //4 rows, 32 columns, in total: 128 elements, single dimensional arr
-        if(state.length<128 || column>31) return;
-        byte temp = state[column];
-        state[column]=state[column+32];
-        state[column+32]=state[column+64];
-        state[column+64]=state[column+96];
-        state[column+96]=temp;
 
-    }
 
     protected static void shiftRows(byte [] arr){
         for(int shifts = 1; shifts<4;shifts++){
@@ -227,7 +268,7 @@ class Main{
 
     private static void encryptData(byte [] state, byte [] roundKey){
         addRoundKey(state,roundKey);
-        for(int round = 1; round<10; round++){
+        for(int round = 1; round<ROUNDS; round++){
             subBytes(state);
             //shiftRows
             shiftRows(state);

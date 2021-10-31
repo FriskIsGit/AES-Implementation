@@ -19,10 +19,8 @@ public class SubBytesTest{
                 (byte)0x3d,(byte)0xf4,(byte)0xc6,(byte)0xf8,
                 (byte)0xe3,(byte)0xe2,(byte)0x8d,(byte)0x48,
                 (byte)0xbe,(byte)0x2b,(byte)0x2a,(byte)0x08};
-        long start = System.nanoTime();
+
         Main.subBytes(state);
-        long end = System.nanoTime();
-        System.out.println("time: " +(end-start));
         assertArrayEquals(expected,state);
     }
     @Test
