@@ -11,7 +11,7 @@ public class KeyScheduleTest{
             126,-82,   -9, -49, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
             21, -46,   21,  79, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
             22, -90, -120,  60, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-        Main.keySchedule(cipher);
+        Main.fullKeySchedule(cipher);
         System.out.println(Arrays.toString(Convert.arrToHexStringArr(cipher)));
     }
     @Test
