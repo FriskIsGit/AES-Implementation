@@ -122,13 +122,24 @@ class Main{
         }
     }
 
+    protected static void xorWithRcon(byte [] initialState, byte[] nextState, int rconInd){
+        for(int i = 0; i<4; i++, rconInd+=10){
+            nextState[4*i] = (byte) (initialState[4*i]^nextState[4*i]^RCON_10[rconInd]);
+        }
+    }
+
     protected static void xor(byte[] arr, int col1, int col2, int targetCol){
         for(;targetCol<BIT_128; targetCol+=32,col1+=32, col2+=32){
             arr[targetCol] = (byte) (arr[col1]^arr[col2]);
         }
     }
+    protected static void xor(byte[] arrL, byte[] arrR, int targetCol){
+        for(int i = 0; i<4; i++){
+            arrR[4*i + targetCol] = (byte)(arrL[4*i + targetCol]^arrR[4*i + targetCol-1]);
+        }
+    }
 
-    protected static void keySchedule(byte [] arr){
+    protected static void fullKeySchedule(byte [] arr){
         for(int block = 0; block < 7; block++){
             final int leadingCol = 4*(block+1);
             rotateVertically(arr,leadingCol-1,leadingCol);
@@ -137,8 +148,21 @@ class Main{
             for(int i = leadingCol+1; i<leadingCol+4; i++){
                 xor(arr,i-4,i-1,i);
             }
-
         }
+    }
+    protected static byte [] keySchedule(byte [] arr){
+        byte [] resultArr = new byte[16];
+        byte [] columnArr = new byte[]{arr[3],arr[7],arr[11],arr[15]};
+        rotateVertically(columnArr);
+        subBytes(columnArr);
+        for(int i=0; i<4;i++){
+            resultArr[4*i] = columnArr[i];
+        }
+        xorWithRcon(arr,resultArr,0);
+        for(int remainingCols = 1; remainingCols<4; remainingCols++){
+            xor(arr,resultArr,remainingCols);
+        }
+        return resultArr;
     }
 
     //128bit?
@@ -149,6 +173,14 @@ class Main{
         state[column+32] = state[accordingTo+64];
         state[column+64] = state[accordingTo+96];
         state[column+96] = state[accordingTo];
+    }
+    protected static void rotateVertically(byte [] columnArr){
+        if(columnArr.length!=4) return;
+        byte temp = columnArr[0];
+        columnArr[0] = columnArr[1];
+        columnArr[1] = columnArr[2];
+        columnArr[2] = columnArr[3];
+        columnArr[3] = temp;
     }
 
 
