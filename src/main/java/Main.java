@@ -103,18 +103,9 @@ class Main{
 
     public static void main(String[] args)  {
 
-        String keyStr = "Two One Nine Two";
-        int [] initialState = new int[]{0x32,0x88,0x31,0xe0,0x43,0x5a,0x31,0x37,0xf6,0x30,0x98,0x07,0xa8,0x8d,0xa2,0x34};
-        byte [] initState = Convert.arrToByteArr(initialState);
-        String [] cipherKeyArr = new String[]{"2b","28","ab","09","7e","ae","f7","cf","15","d2","15","4f","16","a6","88","3c"};
-        byte [] key = new byte[]{43, 40, -85, 9, 126, -82, -9, -49, 21, -46, 21, 79, 22, -90, -120, 60};
-        System.out.println(Arrays.toString(initState));
-        System.out.println(Arrays.toString(key));
-
-
-        encryptData((byte[]) null,null);
 
     }
+
     protected static void xorWithRcon(byte[] arr, final int rconCol, final int col1, final int col2){
         int diff = col2-col1;
         for(int i = col1, ri=rconCol; i+diff<BIT_128; i+=32, ri+=10){
@@ -150,7 +141,7 @@ class Main{
             }
         }
     }
-    protected static byte [] keySchedule(byte [] arr){
+    protected static byte [] keySchedule(byte [] arr, final int RCON_COL){
         byte [] resultArr = new byte[16];
         byte [] columnArr = new byte[]{arr[3],arr[7],arr[11],arr[15]};
         rotateVertically(columnArr);
@@ -158,7 +149,7 @@ class Main{
         for(int i=0; i<4;i++){
             resultArr[4*i] = columnArr[i];
         }
-        xorWithRcon(arr,resultArr,0);
+        xorWithRcon(arr,resultArr,RCON_COL);
         for(int remainingCols = 1; remainingCols<4; remainingCols++){
             xor(arr,resultArr,remainingCols);
         }
@@ -298,19 +289,20 @@ class Main{
         }
     }
 
-    private static void encryptData(byte [] state, byte [] roundKey){
+    protected static byte[] encryptData(byte[] state, byte[] roundKey){
         addRoundKey(state,roundKey);
         for(int round = 1; round<ROUNDS; round++){
             subBytes(state);
-            //shiftRows
             shiftRows(state);
-            mixColumns(state);
+            state = mixColumns(state);
+            roundKey = keySchedule(roundKey,round-1);
             addRoundKey(state,roundKey);
         }
         subBytes(state);
         shiftRows(state);
+        roundKey = keySchedule(roundKey,ROUNDS-1);
         addRoundKey(state,roundKey);
-        System.out.println(Arrays.toString(Convert.arrToHexStringArr(state)));
+        return state;
     }
 
     private static void encryptData(String plainText, String key){

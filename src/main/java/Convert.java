@@ -11,10 +11,31 @@ class Convert{
             return -1;
         }
     }
+    protected static String arrToString(int [] arr){
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0;i<arr.length; i++){
+            sb.append((char)arr[i]);
+        }
+        return sb.toString();
+    }
+    protected static String arrToString(byte [] arr){
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0;i<arr.length; i++){
+            sb.append((char)arr[i]);
+        }
+        return sb.toString();
+    }
     protected static byte [] arrToByteArr(int [] arr){
         byte [] byteArr = new byte[arr.length];
         for(int i = 0; i<arr.length; i++){
             byteArr[i] = (byte)arr[i];
+        }
+        return byteArr;
+    }
+    protected static byte [] arrToByteArr(String [] hexArr){
+        byte [] byteArr = new byte[hexArr.length];
+        for(int i = 0; i<hexArr.length; i++){
+            byteArr[i] = (byte)Convert.hexStringToInt(hexArr[i]);
         }
         return byteArr;
     }
