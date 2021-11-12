@@ -27,4 +27,10 @@ class Printer{
             System.out.println();
         }
     }
+    protected static void printGalois(){
+        formatPrintArr(Encryption.GALOIS,4,4);
+    }
+    protected static void printInvGalois(){
+        formatPrintArr(Decryption.INVERSE_MIX_COL,4,4);
+    }
 }

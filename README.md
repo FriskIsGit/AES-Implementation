@@ -1,4 +1,4 @@
-#AES implementation
+# AES implementation
 ### Advanced Encryption Algorithm (Rijndael)
 
 - [x] two-way process of encryption and decryption with the use of a key

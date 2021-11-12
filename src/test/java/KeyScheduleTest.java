@@ -13,7 +13,7 @@ public class KeyScheduleTest{
             21, -46,   21,  79, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
             22, -90, -120,  60, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
         Printer.formatPrintArr(cipher,4,32);
-        Main.fullKeySchedule(cipher);
+        Encryption.fullKeySchedule(cipher);
         System.out.println(Arrays.toString(Convert.arrToHexStringArr(cipher)));
     }
     @Test
@@ -22,7 +22,7 @@ public class KeyScheduleTest{
         byte [] expectedArr = Convert.arrToByteArr(expectedStrArr);
 
         byte [] cipherKey0 = new byte[]{43, 40, -85, 9, 126, -82, -9, -49, 21, -46, 21, 79, 22, -90, -120, 60};
-        byte [] roundKey0 = Main.keySchedule(cipherKey0,0);
+        byte [] roundKey0 = Encryption.keySchedule(cipherKey0,0);
         assertArrayEquals(expectedArr,roundKey0);
     }
     @Test
@@ -31,14 +31,14 @@ public class KeyScheduleTest{
         byte [] expectedArr = Convert.arrToByteArr(expectedStrArr);
 
         byte [] cipherKey1 = {-96, -120, 35, 42, -6, 84, -93, 108, -2, 44, 57, 118, 23, -79, 57, 5};
-        byte [] roundKey1 = Main.keySchedule(cipherKey1,1);
+        byte [] roundKey1 = Encryption.keySchedule(cipherKey1,1);
         assertArrayEquals(expectedArr,roundKey1);
     }
     @Test
     public void test4by4_rcon9(){
         byte [] nextKey = {-96, -120, 35, 42, -6, 84, -93, 108, -2, 44, 57, 118, 23, -79, 57, 5};
         for(int round = 1; round<10; round++){
-            nextKey = Main.keySchedule(nextKey,round);
+            nextKey = Encryption.keySchedule(nextKey,round);
         }
         String [] expectedHex = new String[]{"d0","c9","e1","b6","14","ee","3f","63","f9","25","0c","0c","a8","89","c8","a6"};
         assertArrayEquals(Convert.arrToByteArr(expectedHex),nextKey);
