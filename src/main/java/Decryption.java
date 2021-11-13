@@ -42,9 +42,6 @@ public class Decryption extends Encryption{
     final static List<Integer> ELEVENS_POWERS = Arrays.asList(0,1,3);
     final static List<Integer> THIRTEENS_POWERS = Arrays.asList(0,2,3);
     final static List<Integer> FOURTEENS_POWERS = Arrays.asList(1,2,3);
-    public static void main(String[] args) {
-
-    }
 
     protected static byte[] decryptData(byte [] state, List<byte[]> roundKeys){
         Encryption.addRoundKey(state, roundKeys.get(ROUNDS));

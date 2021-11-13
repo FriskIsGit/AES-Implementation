@@ -130,15 +130,6 @@ class Encryption{
     final static int BIT_128 = 128;
     final static int ROUNDS = 10;
     protected List<byte []> ciphersList = new LinkedList<>();
-    Encryption(){
-    }
-    public static int getRandom(){
-        return (int)(Math.random()*(122-97+1))+97;
-    }
-
-    public static void main(String[] args)  {
-
-    }
 
     protected static void xorWithRcon(byte[] arr, final int rconCol, final int col1, final int col2){
         int diff = col2-col1;
@@ -220,7 +211,6 @@ class Encryption{
             }
         }
         return paddedArr;
-
     }
 
     protected static void subBytesTwoDimensional(byte[] state){
@@ -348,19 +338,6 @@ class Encryption{
         return state;
     }
 
-    private static void encryptData(String plainText, String key){
-        for(int round = 1; round<10; round++){
-
-        }
-    }
-
-    private static String getPass(){
-        Scanner scan = new Scanner(System.in);
-        String pass = scan.nextLine();
-        byte [] inputArr = pass.getBytes(StandardCharsets.UTF_8);
-        System.out.println(Arrays.toString(inputArr));
-        return pass;
-    }
 }
 //256^16 = (2^8)^16 = 2^128
 //256^24 = (2^8)^24 = 2^192

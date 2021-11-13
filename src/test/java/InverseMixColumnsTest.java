@@ -27,7 +27,7 @@ public class InverseMixColumnsTest{
         assertArrayEquals(Convert.arrToByteArr(reversed),result);
     }
     @Test
-    public void tutorialDotProduct(){
+    public void tutDotProduct(){
 
         List<Integer> powersList1 = Decryption.getPowers((byte)214);
         List<Integer> powersList2 = Decryption.getPowers((byte)54);

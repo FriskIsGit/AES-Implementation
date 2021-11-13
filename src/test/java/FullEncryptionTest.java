@@ -40,7 +40,6 @@ public class FullEncryptionTest{
         byte [] roundKey = new byte[]{43, 40, -85, 9, 126, -82, -9, -49, 21, -46, 21, 79, 22, -90, -120, 60};
 
         for(int i = 0;i<TESTS; i++) FullEncryptionTest.encryptData(state, roundKey);
-
         //int count = 0;
         BigInteger sum = new BigInteger("0");
         for(long timeStamp : times){
