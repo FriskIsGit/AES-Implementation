@@ -7,6 +7,14 @@ public class MixColumnsTest{
     byte byteRow3Col0 = (byte)0x30;
 
     @Test
+    public void lookupTableTest(){
+        int result1 = Decryption.gfp2[Byte.toUnsignedInt(byteRow0Col0)];
+        int result2 = Decryption.gfp3[Byte.toUnsignedInt(byteRow1Col0)];
+        int result3 = byteRow2Col0;
+        int result4 = byteRow3Col0;
+        assertEquals((byte)0x4,result1^result2^result3^result4);
+    }
+    @Test
     public void testRow0Col0(){
         byte result1 = Encryption.multiply(byteRow0Col0,2);
         byte result2 = Encryption.multiply(byteRow1Col0,3);
