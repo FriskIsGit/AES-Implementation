@@ -8,9 +8,26 @@
 - key lengths: 128, 192, 256 bits
 - constant block size: 128 bits
 
+#### Usage
+
+```java
+class Main{
+    public static void main(String[] args){
+        byte[] data = "what".getBytes();
+        byte[] password = "defense".getBytes();
+        
+        byte[] encryptedBytes = Decryption.decryptData(data, password);
+        
+        byte[] decryptedBytes = Decryption.decryptData(encryptedBytes, password);
+        assert new String(decryptedBytes).startsWith("what");
+    }
+}
+```
+
 #### sources:
 - https://formaestudio.com/rijndaelinspector/archivos/Rijndael_Animation_v4_eng-html5.html
 - https://crypto.stackexchange.com/questions/2402/how-to-solve-mixcolumns
 
 ![image](mixColumns.png)
 ![image](standards.png)
+

@@ -9,7 +9,7 @@ public class SubBoxesTwoWayTest{
                 count++;
             }
         }
-        assertEquals(Encryption.BYTE_S_BOX.length,count);
+        assertEquals(Encryption.BYTE_S_BOX.length, count);
     }
     @Test
     public void inv_to_sub(){
@@ -19,6 +19,6 @@ public class SubBoxesTwoWayTest{
                 count++;
             }
         }
-        assertEquals(Decryption.INT_INVERSE_S_BOX.length,count);
+        assertEquals(Decryption.INT_INVERSE_S_BOX.length, count);
     }
 }

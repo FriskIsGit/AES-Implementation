@@ -128,7 +128,7 @@ class Encryption{
     final static int[] GALOIS = new int[]{2,3,1,1, 1,2,3,1, 1,1,2,3, 3,1,1,2};
     final static int BIT_128 = 128;
     final static int ROUNDS = 10;
-    protected List<byte []> ciphersList = new LinkedList<>();
+    protected List<byte[]> ciphersList = new LinkedList<>();
     static final int[] gfp2 = {0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 166, 168, 170, 172, 174, 176, 178, 180, 182, 184, 186, 188, 190, 192, 194, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 242, 244, 246, 248, 250, 252, 254, 27, 25, 31, 29, 19, 17, 23, 21, 11, 9, 15, 13, 3, 1, 7, 5, 59, 57, 63, 61, 51, 49, 55, 53, 43, 41, 47, 45, 35, 33, 39, 37, 91, 89, 95, 93, 83, 81, 87, 85, 75, 73, 79, 77, 67, 65, 71, 69, 123, 121, 127, 125, 115, 113, 119, 117, 107, 105, 111, 109, 99, 97, 103, 101, 155, 153, 159, 157, 147, 145, 151, 149, 139, 137, 143, 141, 131, 129, 135, 133, 187, 185, 191, 189, 179, 177, 183, 181, 171, 169, 175, 173, 163, 161, 167, 165, 219, 217, 223, 221, 211, 209, 215, 213, 203, 201, 207, 205, 195, 193, 199, 197, 251, 249, 255, 253, 243, 241, 247, 245, 235, 233, 239, 237, 227, 225, 231, 229};
     static final int[] gfp3 = {0, 3, 6, 5, 12, 15, 10, 9, 24, 27, 30, 29, 20, 23, 18, 17, 48, 51, 54, 53, 60, 63, 58, 57, 40, 43, 46, 45, 36, 39, 34, 33, 96, 99, 102, 101, 108, 111, 106, 105, 120, 123, 126, 125, 116, 119, 114, 113, 80, 83, 86, 85, 92, 95, 90, 89, 72, 75, 78, 77, 68, 71, 66, 65, 192, 195, 198, 197, 204, 207, 202, 201, 216, 219, 222, 221, 212, 215, 210, 209, 240, 243, 246, 245, 252, 255, 250, 249, 232, 235, 238, 237, 228, 231, 226, 225, 160, 163, 166, 165, 172, 175, 170, 169, 184, 187, 190, 189, 180, 183, 178, 177, 144, 147, 150, 149, 156, 159, 154, 153, 136, 139, 142, 141, 132, 135, 130, 129, 155, 152, 157, 158, 151, 148, 145, 146, 131, 128, 133, 134, 143, 140, 137, 138, 171, 168, 173, 174, 167, 164, 161, 162, 179, 176, 181, 182, 191, 188, 185, 186, 251, 248, 253, 254, 247, 244, 241, 242, 227, 224, 229, 230, 239, 236, 233, 234, 203, 200, 205, 206, 199, 196, 193, 194, 211, 208, 213, 214, 223, 220, 217, 218, 91, 88, 93, 94, 87, 84, 81, 82, 67, 64, 69, 70, 79, 76, 73, 74, 107, 104, 109, 110, 103, 100, 97, 98, 115, 112, 117, 118, 127, 124, 121, 122, 59, 56, 61, 62, 55, 52, 49, 50, 35, 32, 37, 38, 47, 44, 41, 42, 11, 8, 13, 14, 7, 4, 1, 2, 19, 16, 21, 22, 31, 28, 25, 26};
 
@@ -139,7 +139,7 @@ class Encryption{
         }
     }
 
-    protected static void xorWithRcon(byte [] initialState, byte[] nextState, int rconInd){
+    protected static void xorWithRcon(byte[] initialState, byte[] nextState, int rconInd){
         for(int i = 0; i<4; i++, rconInd+=10){
             nextState[4*i] = (byte) (initialState[4*i]^nextState[4*i]^RCON_10[rconInd]);
         }
@@ -156,20 +156,21 @@ class Encryption{
         }
     }
 
-    protected static void fullKeySchedule(byte [] arr){
+    protected static void fullKeySchedule(byte[] arr){
         for(int block = 0; block < 7; block++){
             final int leadingCol = 4*(block+1);
             rotateVertically(arr,leadingCol-1,leadingCol);
             subBytes(arr, leadingCol);
             xorWithRcon(arr, block, leadingCol-4, leadingCol);
             for(int i = leadingCol+1; i<leadingCol+4; i++){
-                xor(arr,i-4,i-1,i);
+                xor(arr,i-4,i-1, i);
             }
         }
     }
-    protected static byte [] keySchedule(byte [] arr, final int RCON_COL){
-        byte [] resultArr = new byte[16];
-        byte [] columnArr = new byte[]{arr[3],arr[7],arr[11],arr[15]};
+    protected static byte[] keySchedule(byte[] arr, final int RCON_COL){
+        byte[] resultArr = new byte[16];
+        arr = ensureSize(arr, 16);
+        byte[] columnArr = new byte[]{arr[3], arr[7], arr[11], arr[15]};
         rotateVertically(columnArr);
         subBytes(columnArr);
         for(int i=0; i<4;i++){
@@ -177,13 +178,22 @@ class Encryption{
         }
         xorWithRcon(arr,resultArr,RCON_COL);
         for(int remainingCols = 1; remainingCols<4; remainingCols++){
-            xor(arr,resultArr,remainingCols);
+            xor(arr, resultArr, remainingCols);
         }
         return resultArr;
     }
 
+    protected static byte[] ensureSize(byte[] arr, int minSize){
+        byte[] newArr = new byte[16];
+        if(arr.length >= minSize){
+            return arr;
+        }
+        System.arraycopy(arr, 0, newArr, 0, arr.length);
+        return newArr;
+    }
+
     //128bit?
-    protected static void rotateVertically(byte [] state, final int accordingTo, final int column){
+    protected static void rotateVertically(byte[] state, final int accordingTo, final int column){
         //4 rows, 32 columns, in total: 128 elements, single dimensional arr
         if(state.length<BIT_128 || column>31) return;
         state[column] = state[accordingTo+32];
@@ -191,7 +201,7 @@ class Encryption{
         state[column+64] = state[accordingTo+96];
         state[column+96] = state[accordingTo];
     }
-    protected static void rotateVertically(byte [] columnArr){
+    protected static void rotateVertically(byte[] columnArr){
         if(columnArr.length!=4) return;
         byte temp = columnArr[0];
         columnArr[0] = columnArr[1];
@@ -203,8 +213,8 @@ class Encryption{
 
     //block cipher      1) append a byte with value 128 (hex 80), followed by as many zero bytes as needed to fill the last block
     //padding concepts  2) pad the last block with n bytes all with value n.
-    protected static byte [] padding(byte [] arr){
-        byte [] paddedArr = new byte[BIT_128];
+    protected static byte[] padding(byte[] arr){
+        byte[] paddedArr = new byte[BIT_128];
         for(int i = 0; i<arr.length; i++){
             if(arr[i]==0){
                 System.arraycopy(arr,0,paddedArr,0,i);
@@ -216,13 +226,13 @@ class Encryption{
 
     protected static void subBytesTwoDimensional(byte[] state){
         for(int i = 0;i<state.length; i++){
-            int [] indexes = Convert.unsignedByteToIndices(Convert.byteToUnsigned(state[i]));
+            int[] indexes = Convert.unsignedByteToIndices(Convert.byteToUnsigned(state[i]));
             state[i] = BYTE_S_BOX_TWO_DIM[indexes[0]][indexes[1]];
         }
     }
     protected static void subBytesTwoDimensional(byte[] arr, int column){
         for(int i = column;i<arr.length; i+=32){
-            int [] indexes = Convert.unsignedByteToIndices(Convert.byteToUnsigned(arr[i]));
+            int[] indexes = Convert.unsignedByteToIndices(Convert.byteToUnsigned(arr[i]));
             arr[i] = BYTE_S_BOX_TWO_DIM[indexes[0]][indexes[1]];
         }
     }
@@ -238,15 +248,15 @@ class Encryption{
     }
 
     //XOR values at respective indices, pass by reference
-    protected static void addRoundKey(byte [] state, byte [] roundKey){
-        for(int i = 0;i<state.length; i++){
+    protected static void addRoundKey(byte[] state, byte[] roundKey){
+        for(int i = 0; i<state.length; i++){
             state[i] = (byte) (state[i]^roundKey[i]);
         }
     }
 
     //traverses galois - horizontally, arr - vertically
-    protected static byte[] mixColumns(byte [] arr){
-        byte [] computedArr = new byte[arr.length];
+    protected static byte[] mixColumns(byte[] arr){
+        byte[] computedArr = new byte[arr.length];
         for(int col = 0; col<4; col++){
             //galois field is traversed in total 4 times
             int galoisCell = 0;
@@ -300,7 +310,7 @@ class Encryption{
     }
     public static byte bt(int x){ return (byte)x; }
 
-    protected static void shiftRows(byte [] state){
+    protected static void shiftRows(byte[] state){
         for(int shifts = 1; shifts<4;shifts++){
             shiftLeft(state,shifts,shifts);
         }
@@ -336,7 +346,9 @@ class Encryption{
     }
 
     protected static byte[] encryptData(byte[] state, byte[] roundKey){
-        addRoundKey(state,roundKey);
+        state = ensureSize(state, 16);
+        roundKey = ensureSize(roundKey, 16);
+        addRoundKey(state, roundKey);
         for(int round = 1; round<ROUNDS; round++){
             subBytes(state);
             shiftRows(state);
