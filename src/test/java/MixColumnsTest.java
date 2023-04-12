@@ -92,10 +92,10 @@ public class MixColumnsTest{
     @Test
     public void entireArrayTransformation(){
         byte[] expected = new byte[]{
-                (byte)0x4, (byte)0xe0, (byte)0x48,(byte)0x28,
-                (byte)0x66,(byte)0xcb,(byte)0xf8,(byte)0x6,
-                (byte)0x81,(byte)0x19,(byte)0xd3,(byte)0x26,
-                (byte)0xe5,(byte)0x9a,(byte)0x7a,(byte)0x4c
+                (byte)0x4,  (byte)0xe0, (byte)0x48, (byte)0x28,
+                (byte)0x66, (byte)0xcb, (byte)0xf8, (byte)0x6,
+                (byte)0x81, (byte)0x19, (byte)0xd3, (byte)0x26,
+                (byte)0xe5, (byte)0x9a, (byte)0x7a, (byte)0x4c
         };
         byte[] input = new byte[]{
                 -44, -32, -72, 30,
