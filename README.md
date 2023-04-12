@@ -15,9 +15,9 @@ class Main{
     public static void main(String[] args){
         byte[] data = "what".getBytes();
         byte[] password = "defense".getBytes();
-        
-        byte[] encryptedBytes = Decryption.decryptData(data, password);
-        
+
+        byte[] encryptedBytes = Encryption.encryptData(data, password);
+
         byte[] decryptedBytes = Decryption.decryptData(encryptedBytes, password);
         assert new String(decryptedBytes).startsWith("what");
     }
